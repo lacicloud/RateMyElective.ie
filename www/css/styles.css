@@ -1,0 +1,124 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  @apply box-border;
+}
+
+html,
+body {
+  @apply p-0 m-0 min-h-screen text-primary-400;
+  /* @apply after:lg:hidden after:content-["Mobile_Optimization_In_Progress"] after:fixed after:!top-0 after:left-0 after:bg-white after:h-screen after:w-screen after:flex after:justify-center after:items-center; */
+}
+
+body.modal-open {
+  @apply overflow-hidden;
+}
+
+.content {
+  @apply max-w-[1440px] mx-auto px-6 sm:px-7 md:px-8 py-6 md:py-12 overflow-hidden;
+}
+
+.nav-pills .nav-link {
+  @apply text-gray-500/60 font-semibold border-b border-gray-300 mb-1 rounded-none px-6 min-w-[100px] lg:min-w-[150px] whitespace-nowrap;
+}
+
+.nav-pills .nav-link.active {
+  @apply bg-white text-primary-500 border-primary-500;
+}
+
+.slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  border-radius: 5px;
+  outline: none;
+  -webkit-transition: 0.2s;
+  transition: opacity 0.2s;
+  @apply !opacity-100 bg-gray-600 h-3;
+}
+
+input[type="range"]::-moz-range-progress {
+  background: transparent;
+}
+
+input[type="range"]::-moz-range-thumb {
+  appearance: none;
+  @apply h-[18px] w-[18px] rounded-full border-4 bg-success-500 !important;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  @apply h-[18px] w-[18px] rounded-full border-4 bg-success-500 p-2 !important;
+}
+
+input[type="range"].error::-moz-range-thumb {
+  appearance: none;
+  @apply h-[18px] w-[18px] rounded-full border-4 bg-error-500 !important;
+}
+
+input[type="range"].error::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  @apply h-[18px] w-[18px] rounded-full border-4 bg-error-500 p-2 !important;
+}
+
+.menu-toggle-button span {
+  display: block;
+  width: 20px; /* Adjust the size of the hamburger lines */
+  height: 2px;
+  background-color: #000; /* Hamburger line color */
+  margin: 5px 0;
+}
+
+.mobile-nav {
+  @apply max-h-0 overflow-hidden transition-all duration-300 ease-in-out;
+}
+
+.mobile-nav.show {
+  @apply flex max-h-[200px];
+}
+
+/* Carried over */
+.container {
+  display: flex;
+  width: 100%;
+  padding-top: 5;
+  height: fit-content;
+}
+
+.info,
+.success-alert,
+.warning,
+.error-alert,
+.validation {
+  border: 1px solid rgba(0, 0, 0, 0.3);
+  border-radius: 2px;
+  margin: 5px 15px 20px 15px;
+  padding: 5px 10px;
+  width: 100%;
+  background-repeat: no-repeat;
+  background-position: 10px center;
+  display: none;
+  color: rgba(25, 25, 25, 0.85);
+}
+
+.info {
+  /*color: #00529B;*/
+  background-color: #bde5f8;
+}
+
+.success-alert {
+  /*color: #4F8A10;*/
+  background-color: #dff2bf;
+}
+
+.warning {
+  /*color: #9F6000;*/
+  background-color: #feefb3;
+}
+
+.error-alert {
+  /*color: #D8000C;*/
+  background-color: #ffbaba;
+}

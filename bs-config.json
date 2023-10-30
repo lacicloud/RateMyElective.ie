@@ -1,0 +1,11 @@
+{
+  "files": [
+    "**/*.php",
+    "**/*.html",
+    "**/css/*.css",
+    "www/css/styles.css",
+    "www/components/*.php"
+  ],
+  "proxy": "localhost",
+  "notify": false
+}

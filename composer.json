@@ -1,0 +1,12 @@
+{
+  "require": {
+    "swiftmailer/swiftmailer": "^6.0",
+    "consoletvs/profanity": "^3.2"
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true,
+  "scripts": {
+    "build": "npx tailwindcss build www/css/styles.css -o www/css/styles-output.css",
+    "watch": "npx tailwindcss build www/css/styles.css -o www/css/styles-output.css --watch"
+  }
+}
