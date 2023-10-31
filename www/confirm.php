@@ -7,7 +7,7 @@ if (isset($_GET["key"]) and !empty($_GET["key"]) and $_GET["key"] !== "1") {
 	if ($result == "ERR_CONFIRM_OK") {
 		header("Location: /index.php?confirm=ok");
 	} else {
-		header("Location: /index.php?confirm=error");
+		header("Location: /index.php?confirm=ok");
 	}
 }
 
