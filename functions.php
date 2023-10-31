@@ -351,10 +351,13 @@ class RateMyElective
 
 		$data = $stmt->fetchAll(PDO::FETCH_GROUP | PDO::FETCH_ASSOC);
 		$email_db = key($data);
-		$password_db = @$data[$email][0]["password"];
-		$id = @$data[$email][0]["id"];
+                $password_db = @$data[$email_db][0]["password"];
+                $id = @$data[$email_db][0]["id"];
 
-		$password = $this->hashPassword($password);
+                $password = $this->hashPassword($password);
+
+                $email = strtolower($email);
+                $email_db = strtolower($email_db);
 
 		if ($password_db == $password and $email_db == $email) {
 			if ($this->checkConfirmed($id) == "ERR_UNCONFIRMED") {
