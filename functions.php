@@ -15,7 +15,7 @@ define("EMAIL_PASSWORD", "");
 class RateMyElective
 {
 
-	public $allowed_emails = array("tcd.ie" => "tcd");
+	public $allowed_emails = array("tcd.ie" => "tcd", "TCD.IE" => "tcd");
 
 	public function getDB()
 	{
