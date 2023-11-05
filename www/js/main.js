@@ -116,7 +116,7 @@ function ValidateForgotStep2(form) {
 }
 
 function ValidateAccountDelete() {
-    return confirm("Are you sure you want to delete your RateMyElective.ie account? This will mean deletion of all of your reviews as well.");
+     if (confirm("Are you sure you want to delete your RateMyElective.ie account? This will mean deletion of all of your reviews as well.")) window.location.href='account.php?delete';
 }
 
 
