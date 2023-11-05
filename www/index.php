@@ -19,6 +19,52 @@ if (isset($_POST["email"]) and isset($_POST["password"]) and !isset($_POST["pass
   }
 }
 
+//Oauth mechanism
+// init configuration 
+
+$clientID = '';
+$clientSecret = '';
+$redirectUri = 'https://ratemyelective.ie/';
+  
+// create Client Request to access Google API 
+$client = new Google_Client();
+$client->setClientId($clientID);
+$client->setClientSecret($clientSecret);
+$client->setRedirectUri($redirectUri);
+$client->addScope("email");
+$client->addScope("profile");
+ 
+// authenticate code from Google OAuth Flow 
+if (isset($_GET['code'])) {
+  $token = $client->fetchAccessTokenWithAuthCode($_GET['code']);
+  $client->setAccessToken($token['access_token']);
+  
+  // get profile info 
+  $google_oauth = new Google_Service_Oauth2($client);
+  $google_account_info = $google_oauth->userinfo->get();
+  $email =  $google_account_info->email;
+  //check whether email already exists in DB
+      if ($api->checkIfAlreadyExists($email) !== "ERR_OK") {
+        //get id 
+        $result = $api->matchEmailtoID($email);
+         $_SESSION["id"] = $result;
+    header("Location: ./interface.php");
+    die(0);
+      } else {
+     $result = $api->createUser($email, "", "", "oauth");
+     if ($result == "ERR_REGISTER_OK") {
+       $result = $api->matchEmailtoID($email);
+         $_SESSION["id"] = $result;
+     header("Location: ./interface.php");
+      die(0);
+     }
+      }
+ 
+  // now you can use this profile info to create account in your website and make user logged in. 
+} 
+//prompt=select_account
+$useroauthhtml = str_replace("approval_prompt=auto","prompt=select_account",$client->createAuthUrl());
+
 if (isset($_GET["confirm"])) {
   if ($_GET["confirm"] == "ok") {
     $result = "ERR_CONFIRM_OK";
@@ -33,7 +79,7 @@ if (isset($_GET["result"])) {
 
 // Registration Code
 if (isset($_POST["email"]) and isset($_POST["password"]) and isset($_POST["password_retyped"]) and !isset($_POST["reset_key"])) {
-  $result = $api->createUser($_POST["email"], $_POST["password"], $_POST["password_retyped"]);
+  $result = $api->createUser($_POST["email"], $_POST["password"], $_POST["password_retyped"], "traditional");
 }
 
 //forgot step 1
@@ -57,7 +103,7 @@ if (isset($_POST["reset_key"]) and isset($_POST["password"]) and isset($_POST["p
   <?php include('header.php'); ?>
   <?php include('./components/button.php'); ?>
 
-  <style>
+<style>
 
 .info, .success, .warning, .error, .validation {
     border: 1px solid rgba(0,0,0,0.3);
@@ -90,6 +136,7 @@ if (isset($_POST["reset_key"]) and isset($_POST["password"]) and isset($_POST["p
     /*color: #D8000C;*/
     background-color: #FFBABA;
 }
+
 
 </style>
 
@@ -127,7 +174,7 @@ if (isset($_POST["reset_key"]) and isset($_POST["password"]) and isset($_POST["p
         </li>
       </ul>
 
-        <div class="row">
+	  <div class="row">
           <div class="success"></div>
           <div class="warning"></div>
           <div class="error"></div>
@@ -150,11 +197,17 @@ if (isset($_POST["reset_key"]) and isset($_POST["password"]) and isset($_POST["p
             </div>
             <div class='mt-2 w-full flex flex-col items-stretch'>
               <?php button("Log In", "", "", "solid", "medium", "primary"); ?>
+
+           
             </div>
           </form>
           <div class="flex justify-end mt-3">
             <?php button("Forgot password?", "", "./index.php?forgot_1", "link", "medium", "primary"); ?>
           </div>
+   <div class='mt-2 w-full flex flex-col items-stretch'>
+             <br><br><br><br><br>
+              <?php button("Log-In with Google", "", $useroauthhtml, "solid", "medium", "primary"); ?>
+  </div>
         </div>
         <div class="tab-pane fade" id="register" role="tabpanel" aria-labelledby="register-tab">
           <form action="/index.php?register" method="POST" onsubmit="return ValidateRegister(this);" class="flex !flex-col !gap-4">
@@ -180,9 +233,13 @@ if (isset($_POST["reset_key"]) and isset($_POST["password"]) and isset($_POST["p
             </div>
             <div class='w-full flex flex-col items-stretch'>
               <?php button("Sign Up", "", "", "solid", "medium", "primary"); ?>
+              <br><br><br><br><br>
+              <?php button("Sign Up with Google", "", $useroauthhtml, "solid", "medium", "primary"); ?>
             </div>
-
+            
           </form>
+
+
         </div>
         <?php if (isset($_GET["forgot_2"])) { ?>
           <div class="tab-pane fade  
@@ -191,8 +248,7 @@ if (isset($_POST["reset_key"]) and isset($_POST["password"]) and isset($_POST["p
             } ?>" id="forgot" role="tabpanel" aria-labelledby="forgot-tab">
             <form action="./index.php?forgot_2&reset_key=<?php echo $_GET['reset_key'] ?>" method="POST" onsubmit="return ValidateForgotStep2(this);" class="flex flex-col gap-4">
               <div class="flex flex-col">
-                <label for="email-address" class="font-semibold">Reset Key</label>
-                <input type="text" id="email-address" class="py-2 px-2 border-gray-500/30 rounded" name="reset_key" <?php echo (isset($_GET["reset_key"]) == true) ? "value='" . $_GET["reset_key"] . "'" : "" ?> required>
+                <input type="hidden" id="email-address" class="py-2 px-2 border-gray-500/30 rounded" name="reset_key" <?php echo (isset($_GET["reset_key"]) == true) ? "value='" . $_GET["reset_key"] . "'" : "" ?> required>
               </div>
               <input type="hidden" name="email" value="<?php echo $api->matchResetKeyToEmail($_GET['reset_key']) ?>">
               <div class="flex gap-4">
@@ -259,6 +315,9 @@ $('#register').tab('show');});";
 
       ?>
     </script>
+
+
+
 </body>
 
 </html>
