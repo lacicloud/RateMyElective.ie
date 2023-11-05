@@ -643,8 +643,6 @@ class RateMyElective
 		$statement = $db->prepare($sql);
 		$statement->execute();
 
-		//TODO PREPARE PRELOADED ELECTIVES
-
 		$sql = 'CREATE TABLE elective_reviews (name TEXT, stars DECIMAL, stars_assessment_difficulty DECIMAL, review TEXT, date_submitted DATE, realID text, institution TEXT, type_entity TEXT)';
 		$statement = $db->prepare($sql);
 		$statement->execute();
