@@ -11,7 +11,6 @@ define("EMAIL_HOST", "");
 define("EMAIL_USERNAME", "");
 define("EMAIL_PASSWORD", "");
 
-
 class RateMyElective
 {
 
@@ -19,7 +18,7 @@ class RateMyElective
 
 	public function getDB()
 	{
-		$db = new PDO('mysql:host=' . MYSQL_HOST . ';dbname=' . MYSQL_DBNAME, MYSQL_USERNAME, MYSQL_PASSWORD);
+		$db = new PDO('mysql:host=' . MYSQL_HOST . ';dbname=' . MYSQL_DBNAME . ';charset=utf8', MYSQL_USERNAME, MYSQL_PASSWORD);
 		return $db;
 	}
 
@@ -84,10 +83,15 @@ class RateMyElective
 
 	public function forgotLoginStep1($email)
 	{
+
 		$id = $this->matchEmailtoID($email);
 
 		if (!isset($id)) {
 			return "ERR_EMAIL_INVALID";
+		}
+
+		if ($this->matchEmailtoType($email) == "oauth") {
+			return "ERR_OAUTH";
 		}
 
 		$reset_key = $this->getNewResetVerificationString();
@@ -99,7 +103,7 @@ class RateMyElective
 		$stmt->bindParam(":id", $id);
 		$stmt->execute();
 
-		$this->sendEmail($email, "RateMyElective - Reset Account",  "<html><body><p>Hi there!</p><p>To reset your account, please click <a href='https://ratemyelective.ie/index.php?forgot_2&reset_key=" . $reset_key . "'>here</a> or go to <a href='https://ratemyelective.ie/index.php?forgot_2'>https://ratemyelective.ie/index.php?forgot_2</a> and enter your reset key: " . $reset_key . ".</p><p>Best regards,<br>RateMyElective</p></body></html>");
+		$this->sendEmail($email, "RateMyElective - Reset Account",  "<html><body><p>Hi there!</p><p>To reset your account, please click <a href='https://ratemyelective.ie/index.php?forgot_2&reset_key=" . $reset_key . "'>here</a>.</p><p>Best regards,<br>RateMyElective</p></body></html>");
 
 		return "ERR_RESET_STEP_1_OK";
 	}
@@ -150,13 +154,13 @@ class RateMyElective
 
 	public function matchCodeToMessage($code)
 	{
-		$array = array("ERR_EXISTS" => "Sorry, email already exists in database!", "ERR_LOGIN_INCORRECT" => "Sorry, email or password incorrect!", "ERR_INVALID_INFO" => "Sorry, email or password could not be validated!", "ERR_INSTITUTION_NOT_FOUND" => "Sorry, your institution is not yet supported or you are not signing up with your institutional email!", "ERR_CAPTCHA" => "Sorry, captcha entered is incorrect!", "ERR_KEY_WRONG" => "Sorry, confirm key is incorrect!", "ERR_CONFIRM_OK" => "Successfully confirmed account!", "ERR_REGISTER_OK" => "Successfully created account! Please confirm it via your email address, check spam too!", "ERR_UNCONFIRMED" => "Account not confirmed! Please confirm it first!", "ERR_RESET_STEP_1_OK" => "Email sent, please check your email account!", "ERR_RESET_STEP_2_OK" => "Account\"s password reset!", "ERR_TOS_UNCHECKED" => "Please check the TOS box before proceeding!", "ERR_OK" => "Action Successfully completed!", "ERR_DELETE_OKAY" => "Successfully deleted comment!", "ERR_OK_SUBMITTED" => "Successfully submitted new comment!", "ERR_SUBMITTED" => "You already have a comment submitted!", "ERR_NOT_ALLOWED" => "Use of profaniy is not allowed!");
+		$array = array("ERR_OAUTH" => "Sorry, this is a Google account, please log-in via Google!", "ERR_EXISTS" => "Sorry, email already exists in database!", "ERR_LOGIN_INCORRECT" => "Sorry, email or password incorrect!", "ERR_INVALID_INFO" => "Sorry, email or password could not be validated!", "ERR_INSTITUTION_NOT_FOUND" => "Sorry, your institution is not yet supported or you are not signing up with your institutional email!", "ERR_CAPTCHA" => "Sorry, captcha entered is incorrect!", "ERR_KEY_WRONG" => "Sorry, confirm key is incorrect!", "ERR_CONFIRM_OK" => "Successfully confirmed account!", "ERR_REGISTER_OK" => "Successfully created account! Please confirm it via your email address, check spam too!", "ERR_UNCONFIRMED" => "Account not confirmed! Please confirm it first!", "ERR_RESET_STEP_1_OK" => "Email sent, please check your email account!", "ERR_RESET_STEP_2_OK" => "Account password reset!", "ERR_TOS_UNCHECKED" => "Please check the TOS box before proceeding!", "ERR_OK" => "Action Successfully completed!", "ERR_DELETE_OKAY" => "Successfully deleted comment!", "ERR_OK_SUBMITTED" => "Successfully submitted new comment!", "ERR_SUBMITTED" => "You already have a comment submitted!", "ERR_NOT_ALLOWED" => "Use of profaniy is not allowed!");
 		return $array[$code];
 	}
 
 	public function matchCodeToType($code)
 	{
-		$array = array("ERR_EXISTS" => "error", "ERR_LOGIN_INCORRECT" => "error", "ERR_INVALID_INFO" => "error", "ERR_CAPTCHA" => "error", "ERR_KEY_WRONG" => "error", "ERR_CONFIRM_OK" => "success", "ERR_INSTITUTION_NOT_FOUND" => "error", "ERR_TOS_UNCHECKED" => "error", "ERR_REGISTER_OK" => "success", "ERR_UNCONFIRMED" => "warning", "ERR_RESET_STEP_1_OK" => "success", "ERR_RESET_STEP_2_OK" => "success", "ERR_OK" => "success", "ERR_DELETE_OKAY" => "success", "ERR_OK_SUBMITTED" => "success", "ERR_SUBMITTED" => "error", "ERR_NOT_ALLOWED" => "error");
+		$array = array("ERR_OAUTH" => "error", "ERR_EXISTS" => "error", "ERR_LOGIN_INCORRECT" => "error", "ERR_INVALID_INFO" => "error", "ERR_CAPTCHA" => "error", "ERR_KEY_WRONG" => "error", "ERR_CONFIRM_OK" => "success", "ERR_INSTITUTION_NOT_FOUND" => "error", "ERR_TOS_UNCHECKED" => "error", "ERR_REGISTER_OK" => "success", "ERR_UNCONFIRMED" => "warning", "ERR_RESET_STEP_1_OK" => "success", "ERR_RESET_STEP_2_OK" => "success", "ERR_OK" => "success", "ERR_DELETE_OKAY" => "success", "ERR_OK_SUBMITTED" => "success", "ERR_SUBMITTED" => "error", "ERR_NOT_ALLOWED" => "error");
 		return $array[$code];
 	}
 
@@ -204,6 +208,19 @@ class RateMyElective
 		return $id;
 	}
 
+	public function matchEmailtoType($email)
+	{
+		$db = $this->getDB();
+		$sql = "SELECT type FROM users WHERE email = :email";
+		$stmt = $db->prepare($sql);
+		$stmt->bindParam(":email", $email);
+		$stmt->execute();
+
+		$type = key(array_map('reset', $stmt->fetchAll(PDO::FETCH_GROUP | PDO::FETCH_ASSOC)));
+
+		return $type;
+	}
+
 	public function checkIfAlreadyExists($email)
 	{
 		$db = $this->getDB();
@@ -221,45 +238,78 @@ class RateMyElective
 		}
 	}
 
-	public function createUser($email, $password, $password_retyped)
+	public function createUser($email, $password, $password_retyped, $type)
 	{
-		$email =  trim($email);
 
-		//verify data
-		if ($this->validateInfo($email, $password, $password_retyped) !== "ERR_OK") {
-			return "ERR_INVALID_INFO";
-		}
+		if ($type == "traditional") {
 
-		//verify whether email already exists in DB
-		if ($this->checkIfAlreadyExists($email) !== "ERR_OK") {
-			return "ERR_EXISTS";
-		}
+			$email =  trim($email);
 
-		//check terms & conditions checkbox
-		if (@count($_POST["checkbox"]) == 0) {
-			//return "ERR_TOS_UNCHECKED";
-		}
+			//verify data
+			if ($this->validateInfo($email, $password, $password_retyped) !== "ERR_OK") {
+				return "ERR_INVALID_INFO";
+			}
 
-		$institution = $this->matchInstitution($email);
-		$password = $this->hashPassword($password);
-		$verification = $this->getNewVerificationString();
+			//verify whether email already exists in DB
+			if ($this->checkIfAlreadyExists($email) !== "ERR_OK") {
+				return "ERR_EXISTS";
+			}
 
-		$this->sendEmail($email, "RateMyElective - Confirm Account",  "<html><body><p>Hi there!</p><p>To confirm your account, please click <a href='https://ratemyelective.ie/confirm.php?key=" . $verification . "'>here</a>.</p><p>Best regards,<br>RateMyElective</p></body></html>");
+			//check terms & conditions checkbox
+			if (@count($_POST["checkbox"]) == 0) {
+				//return "ERR_TOS_UNCHECKED";
+			}
+
+			$institution = $this->matchInstitution($email);
+			$password = $this->hashPassword($password);
+			$verification = $this->getNewVerificationString();
+
+			$this->sendEmail($email, "RateMyElective - Confirm Account",  "<html><body><p>Hi there!</p><p>To confirm your account, please click <a href='https://ratemyelective.ie/confirm.php?key=" . $verification . "'>here</a>.</p><p>Best regards,<br>RateMyElective</p></body></html>");
 
 
-		$reset_key = '1';
+			$reset_key = '1';
 
-		$db = $this->getDB();
-		$sql = "INSERT INTO users (email, password, confirmed, reset_key, institution) VALUES (:email, :password, :confirmed, :reset_key, :institution)";
-		$stmt = $db->prepare($sql);
-		$stmt->bindParam(':email', $email);
-		$stmt->bindParam(':password', $password);
-		$stmt->bindParam(':confirmed', $verification);
-		$stmt->bindParam(':reset_key', $reset_key);
-		$stmt->bindParam(':institution', $institution);
-		$stmt->execute();
+			$db = $this->getDB();
+			$sql = "INSERT INTO users (email, password, confirmed, reset_key, institution, type) VALUES (:email, :password, :confirmed, :reset_key, :institution, :type)";
 
-		return "ERR_REGISTER_OK";
+			$stmt = $db->prepare($sql);
+			$stmt->bindParam(':email', $email);
+			$stmt->bindParam(':password', $password);
+			$stmt->bindParam(':confirmed', $verification);
+			$stmt->bindParam(':reset_key', $reset_key);
+			$stmt->bindParam(':institution', $institution);
+			$stmt->bindParam(':type', $type);
+			$stmt->execute();
+
+			return "ERR_REGISTER_OK";
+
+	} elseif ($type == "oauth") {
+				
+
+			if (!array_key_exists(array_pop(explode('@', $email)), $this->allowed_emails)) {
+				return "ERR_INSTITUTION_NOT_FOUND";
+			}
+
+
+			$institution = $this->matchInstitution($email);
+			$password = "";
+			$verification = "1";
+			$reset_key = "1";
+
+			$db = $this->getDB();
+			$sql = "INSERT INTO users (email, password, confirmed, reset_key, institution, type) VALUES (:email, :password, :confirmed, :reset_key, :institution, :type)";
+			$stmt = $db->prepare($sql);
+			$stmt->bindParam(':email', $email);
+			$stmt->bindParam(':password', $password);
+			$stmt->bindParam(':confirmed', $verification);
+			$stmt->bindParam(':reset_key', $reset_key);
+			$stmt->bindParam(':institution', $institution);
+			$stmt->bindParam(':type', $type);
+			$stmt->execute();
+
+			return "ERR_REGISTER_OK";
+	}
+
 	}
 
 	public function sendEmail($to, $subject, $body)
@@ -343,6 +393,10 @@ class RateMyElective
 			return "ERR_INVALID_INFO";
 		}
 
+		if ($this->matchEmailtoType($email) == "oauth") {
+			return "ERR_OAUTH";
+		}
+
 		$db = $this->getDB();
 		$sql = "SELECT email, password, id FROM users WHERE email = :email";
 		$stmt = $db->prepare($sql);
@@ -351,21 +405,27 @@ class RateMyElective
 
 		$data = $stmt->fetchAll(PDO::FETCH_GROUP | PDO::FETCH_ASSOC);
 		$email_db = key($data);
-                $password_db = @$data[$email_db][0]["password"];
-                $id = @$data[$email_db][0]["id"];
+		$password_db = @$data[$email_db][0]["password"];
+		$id = @$data[$email_db][0]["id"];
 
-                $password = $this->hashPassword($password);
+		$password = $this->hashPassword($password);
 
-                $email = strtolower($email);
-                $email_db = strtolower($email_db);
+		$email = strtolower($email);
+		$email_db = strtolower($email_db);
+
 
 		if ($password_db == $password and $email_db == $email) {
+		
+		
 			if ($this->checkConfirmed($id) == "ERR_UNCONFIRMED") {
-				return "ERR_UNCONFIRMED";
+				
+	return "ERR_UNCONFIRMED";
 			} else {
+		
 				return $id;
 			}
 		} else {
+		
 			return "ERR_LOGIN_INCORRECT";
 		}
 	}
@@ -575,7 +635,7 @@ class RateMyElective
 	{
 		$db =  $this->getDB();
 
-		$sql = "CREATE TABLE users (id INTEGER NOT NULL PRIMARY KEY AUTO_INCREMENT, email TEXT, password TEXT, confirmed TEXT, reset_key TEXT, institution TEXT)";
+		$sql = "CREATE TABLE users (id INTEGER NOT NULL PRIMARY KEY AUTO_INCREMENT, email TEXT, password TEXT, confirmed TEXT, reset_key TEXT, institution TEXT, type TEXT)";
 		$statement = $db->prepare($sql);
 		$statement->execute();
 
@@ -583,11 +643,13 @@ class RateMyElective
 		$statement = $db->prepare($sql);
 		$statement->execute();
 
+		//TODO PREPARE PRELOADED ELECTIVES
+
 		$sql = 'CREATE TABLE elective_reviews (name TEXT, stars DECIMAL, stars_assessment_difficulty DECIMAL, review TEXT, date_submitted DATE, realID text, institution TEXT, type_entity TEXT)';
 		$statement = $db->prepare($sql);
 		$statement->execute();
 	}
-
+	
 	public function createData()
 	{
 
