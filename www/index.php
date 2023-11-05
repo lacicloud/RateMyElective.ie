@@ -205,7 +205,7 @@ if (isset($_POST["reset_key"]) and isset($_POST["password"]) and isset($_POST["p
             <?php button("Forgot password?", "", "./index.php?forgot_1", "link", "medium", "primary"); ?>
           </div>
    <div class='mt-2 w-full flex flex-col items-stretch'>
-             <br><br><br><br><br>
+             <br><br>
               <?php button("Log-In with Google", "", $useroauthhtml, "solid", "medium", "primary"); ?>
   </div>
         </div>
@@ -233,7 +233,7 @@ if (isset($_POST["reset_key"]) and isset($_POST["password"]) and isset($_POST["p
             </div>
             <div class='w-full flex flex-col items-stretch'>
               <?php button("Sign Up", "", "", "solid", "medium", "primary"); ?>
-              <br><br><br><br><br>
+              <br><br>
               <?php button("Sign Up with Google", "", $useroauthhtml, "solid", "medium", "primary"); ?>
             </div>
             
