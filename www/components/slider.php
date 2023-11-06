@@ -1,14 +1,25 @@
 <?php
-function slider($difficulty = 3, $id = "custom-slider", $name = "", $disabled = true)
+function slider($difficulty = 3, $id = "custom-slider", $name = "", $disabled = true, $workload)
 {
   $sliderClass = $difficulty > 3 ? "" : "";
+  $workloadClass = $workload > 3 ? "" : "";
   $isDisabled = $disabled ? 'disabled' : '';
-
+if ($difficulty !== "") {
   echo "
     <div class='relative cursor-pointer'>
       <input type='range' min='1' max='5' value='{$difficulty}' class='slider {$sliderClass}' id='{$id}' name='{$name}' {$isDisabled} />
     </div>
   ";
+} else {
+  echo "
+    <div class='relative cursor-pointer'>
+      <input type='range' min='1' max='5' value='{$workload}' class='slider {$workloadClass}' id='{$id}' name='{$name}' {$isDisabled} />
+    </div>
+  ";
+}
+  
+
+  
 }
 ?>
 <script>
