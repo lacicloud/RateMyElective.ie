@@ -20,13 +20,13 @@ function reviewModal($elective_data_to_get, $exchangemode, $elective_name_to_get
   $isDisabled = $id !== "new" ? 'disabled' : '';
   $isUsersReview = intval($userId) === intval($id);
   $buttonClasses =  $isUsersReview || $id === "new" ? "" : " hidden";
-
+  
   if ($isUsersReview == true) { 
 
     $isDisabled = false;
 
  }
-  
+
   echo '
     <div id="modal-container" class="fixed top-0 left-0 w-full h-[100svh] flex items-center justify-center overflow-hidden !mt-0' . $classes .  ' "">
         <div class="modal-background fixed top-0 left-0 w-full h-[100vh] bg-black opacity-40" onclick="toggleModal()"></div>
@@ -59,8 +59,14 @@ function reviewModal($elective_data_to_get, $exchangemode, $elective_name_to_get
                             ' . ($exchangemode ? "Price" : "Difficulty") . '
                         </div>';
 
-  slider($foundItem["stars_assessment_difficulty"], "modal-slider", 'stars_assessment_difficulty', $isDisabled);
-
+  slider($foundItem["stars_assessment_difficulty"], "modal-slider", 'stars_assessment_difficulty', $isDisabled, "");
+  echo '
+                    </div>
+                    <div class="flex flex-col gap-2">
+                        <div class="font-semibold md:text-right">
+                                ' . ($exchangemode ? "Fun" : "Workload") . '
+                        </div>';
+  slider("", "modal-slider", 'stars_workload_difficulty', $isDisabled, $foundItem["stars_workload_difficulty"]);
   echo '
                     </div>
                 </div>
@@ -71,8 +77,13 @@ function reviewModal($elective_data_to_get, $exchangemode, $elective_name_to_get
                     <textarea name="review_text" id="review_text" rows="6" cols="50" required="true"' . $isDisabled . ' class="p-3 border-gray-500/50 rounded-lg disabled:bg-gray-100 disabled:text-black/90 disabled:opacity-100" placeholder="Write a review...">' . $foundItem["review"] . '</textarea>
                 </div>
 
+
+
                 
                 <div class="mt-4 flex flex-col-reverse md:flex-row justify-center md:items-center gap-4' . $buttonClasses  . '">';
+
+
+
   button("Delete Review", "", "./elective.php?elective=$elective_name_to_get&deleteUserReview", "solid", "medium", "error", $isNew);
   button("Edit Review", "", "", "solid", "medium", "success", $isNew);
   button("Submit Review", "", "", "solid", "medium", "success", $isUsersReview);
