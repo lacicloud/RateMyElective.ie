@@ -45,12 +45,12 @@ if ($api->verifyElectiveName($elective_name_to_get, $institution) !== "ERR_OK") 
 
 //update function
 
-if (isset($_POST["review_text"]) && isset($_POST["stars"]) && isset($_POST["stars_assessment_difficulty"]) && !isset($_POST["update"])) {
+if (isset($_POST["review_text"]) && isset($_POST["stars"]) && isset($_POST["stars_assessment_difficulty"]) && isset($_POST["stars_workload_difficulty"]) && !isset($_POST["update"])) {
 	$entity_type = $api->getEntityTypeByName($elective_name_to_get, $institution);
-	$result = $api->insertNewReview($elective_name_to_get, $_POST["stars"], $_POST["stars_assessment_difficulty"], $institution, $_POST["review_text"], $id, $entity_type);
-} elseif (isset($_POST["review_text"]) && isset($_POST["stars"]) && isset($_POST["stars_assessment_difficulty"]) && isset($_POST["update"])) {
+	$result = $api->insertNewReview($elective_name_to_get, $_POST["stars"], $_POST["stars_assessment_difficulty"], $institution, $_POST["review_text"], $id, $entity_type, $_POST["stars_workload_difficulty"]);
+} elseif (isset($_POST["review_text"]) && isset($_POST["stars"]) && isset($_POST["stars_assessment_difficulty"]) && isset($_POST["stars_workload_difficulty"]) && isset($_POST["update"])) {
 	$entity_type = $api->getEntityTypeByName($elective_name_to_get, $institution);
-	$result = $api->updateReview($elective_name_to_get, $_POST["stars"], $_POST["stars_assessment_difficulty"], $institution, $_POST["review_text"], $id, $entity_type);
+	$result = $api->updateReview($elective_name_to_get, $_POST["stars"], $_POST["stars_assessment_difficulty"], $institution, $_POST["review_text"], $id, $entity_type, $_POST["stars_workload_difficulty"]);
 } else {
 	if (isset($_GET["deleteUserReview"])) {
 		$result = $api->deleteReview($elective_name_to_get, $id, $institution);
@@ -59,6 +59,7 @@ if (isset($_POST["review_text"]) && isset($_POST["stars"]) && isset($_POST["star
 
 $stars = $api->getElectiveStars($elective_name_to_get, $institution);
 $difficulty = $api->getElectiveStarsDifficulty($elective_name_to_get, $institution);
+$workload = $api->getElectiveStarsWorkload($elective_name_to_get, $institution);
 $description = $api->getElectiveDescriptionByName($elective_name_to_get, $institution);
 $entity_type = $api->getEntityTypeByName($elective_name_to_get, $institution);
 
@@ -120,7 +121,19 @@ if (isset($_GET["exchangemode"])) {
 					}
 					?>
 				</div>
-				<?php slider($difficulty, 'elective-detail', true); ?>
+				<?php slider($difficulty, 'elective-detail', true, true, ""); ?>
+
+				<div class="md:text-lg font-medium text-gray-400">
+					<?php
+					if ($exchangemode) {
+						echo "Fun: ";
+					} else {
+						echo "Workload: ";
+					}
+					?>
+				</div>
+				<?php slider("", 'elective-detail', true, true, $workload); ?>
+
 			</div>
 		</header>
 		<section class="">
@@ -152,6 +165,7 @@ if (isset($_GET["exchangemode"])) {
 						$description = $value["review"];
 						$stars = $value["stars"];
 						$date = "Posted on: " . $value["date_submitted"];
+						$workload = $value["stars_workload_difficulty"];
 
 						$difficulty = $value["stars_assessment_difficulty"];
 
@@ -161,8 +175,16 @@ if (isset($_GET["exchangemode"])) {
 							$specialstring = "Difficulty: ";
 						}
 
+
+						if ($exchangemode) {
+							$specialstring2 = "Fun: ";
+						} else {
+							$specialstring2 = "Workload: ";
+						}
+
+
 						$onClick = "toggleModal('$realID');";
-						reviewCard($title, $description, $stars, $date, $specialstring . $difficulty, "", $onClick, true);
+						reviewCard($title, $description, $stars, $specialstring2. $workload, $date, $specialstring . $difficulty, "", $onClick, true);
 					}
 				}
 				?>
