@@ -488,6 +488,23 @@ class RateMyElective
 		}
 	}
 
+	public function getElectiveStarsWorkload($elective, $institution)
+	{
+		$db = $this->getDB();
+		$sql = "SELECT AVG(stars_workload_difficulty) FROM elective_reviews WHERE name = :elective AND institution = :institution";
+		$stmt = $db->prepare($sql);
+		$stmt->bindParam(":elective", $elective);
+		$stmt->bindParam(":institution", $institution);
+		$stmt->execute();
+
+		$average = key(array_map('reset', $stmt->fetchAll(PDO::FETCH_GROUP | PDO::FETCH_ASSOC)));
+		if ($average == "") {
+			return "ERR_EMPTY_REVIEWS";
+		} else {
+			return $average;
+		}
+	}
+
 	public function verifyElectiveName($elective, $institution)
 	{
 		$db = $this->getDB();
@@ -577,16 +594,16 @@ class RateMyElective
 		return "ERR_DELETE_OKAY";
 	}
 
-	public function updateReview($elective, $stars, $stars_assessment_difficulty, $institution, $review_text, $user_id, $type_entity) {
+	public function updateReview($elective, $stars, $stars_assessment_difficulty, $institution, $review_text, $user_id, $type_entity, $stars_workload_difficulty) {
 		$db =  $this->getDB();
 
 		$this->deleteReview($elective, $user_id, $institution);
 
-		return $this->insertNewReview($elective, $stars, $stars_assessment_difficulty, $institution, $review_text, $user_id, $type_entity);
+		return $this->insertNewReview($elective, $stars, $stars_assessment_difficulty, $institution, $review_text, $user_id, $type_entity, $stars_workload_difficulty);
 
 	}
 
-	public function insertNewReview($elective, $stars, $stars_assessment_difficulty, $institution, $review_text, $user_id, $type_entity)
+	public function insertNewReview($elective, $stars, $stars_assessment_difficulty, $institution, $review_text, $user_id, $type_entity, $stars_workload_difficulty)
 	{
 		$db =  $this->getDB();
 
@@ -602,8 +619,8 @@ class RateMyElective
 
 
 
-		if (is_numeric($stars) && $stars > 0 && $stars <= 5 && is_numeric($stars_assessment_difficulty) && $stars_assessment_difficulty > 0 && $stars_assessment_difficulty <= 5) {
-			$sql = "INSERT INTO elective_reviews (name, stars, stars_assessment_difficulty, review, date_submitted, realID, institution, type_entity) VALUES (:name, :stars, :stars_assessment_difficulty, :review, :date_submitted, :realID, :institution, :type_entity)";
+		if (is_numeric($stars) && $stars > 0 && $stars <= 5 && is_numeric($stars_assessment_difficulty) && $stars_assessment_difficulty > 0 && $stars_assessment_difficulty <= 5 && is_numeric($stars_workload_difficulty) && $stars_workload_difficulty > 0 && $stars_workload_difficulty <= 5 && is_numeric($stars_workload_difficulty)) {
+			$sql = "INSERT INTO elective_reviews (name, stars, stars_assessment_difficulty, review, date_submitted, realID, institution, type_entity, stars_workload_difficulty) VALUES (:name, :stars, :stars_assessment_difficulty, :review, :date_submitted, :realID, :institution, :type_entity, :stars_workload_difficulty)";
 			$stmt = $db->prepare($sql);
 			$stmt->bindParam(':name', $elective);
 			$stmt->bindParam(':stars', $stars);
@@ -613,6 +630,7 @@ class RateMyElective
 			$stmt->bindParam(':realID', $user_id);
 			$stmt->bindParam(':institution', $institution);
 			$stmt->bindParam(':type_entity', $type_entity);
+			$stmt->bindParam(':stars_workload_difficulty', $stars_workload_difficulty);
 			$stmt->execute();
 
 			return "ERR_OK_SUBMITTED";
@@ -643,7 +661,7 @@ class RateMyElective
 		$statement = $db->prepare($sql);
 		$statement->execute();
 
-		$sql = 'CREATE TABLE elective_reviews (name TEXT, stars DECIMAL, stars_assessment_difficulty DECIMAL, review TEXT, date_submitted DATE, realID text, institution TEXT, type_entity TEXT)';
+		$sql = 'CREATE TABLE elective_reviews (name TEXT, stars DECIMAL, stars_assessment_difficulty DECIMAL, review TEXT, date_submitted DATE, realID text, institution TEXT, type_entity TEXT, stars_workload_difficulty DECIMAL)';
 		$statement = $db->prepare($sql);
 		$statement->execute();
 	}
