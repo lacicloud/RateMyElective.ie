@@ -1,7 +1,7 @@
 <?php include 'starRating.php'; ?>
 
 <?php
-function reviewCard($title, $description, $rating, $subtitle = "", $subtitle2 = "", $href = "", $onClick = "", $isItalics = false)
+function reviewCard($title, $description, $rating, $subtitle = "", $subtitle2 = "", $subtitle3, $href = "", $onClick = "", $isItalics = false)
 {
 
   $tag = 'button';
@@ -26,6 +26,7 @@ function reviewCard($title, $description, $rating, $subtitle = "", $subtitle2 = 
     <div class='flex justify-between items-center gap-2 mb-3'>
       <div class='text-[11px] text-gray-500 mt-1 subtitle'>{$subtitle}</div>
       <div class='text-[11px] text-gray-500 mt-1 subtitle-two'>{$subtitle2}</div>
+       <div class='text-[11px] text-gray-500 mt-1 subtitle-three'>{$subtitle3}</div>
     </div>
     <div class='text-[14px] text-left line-clamp-3 $descriptionClasses' title='{$description}'>{$description}</div>
   </{$tag}>";
