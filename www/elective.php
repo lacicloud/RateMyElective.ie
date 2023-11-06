@@ -146,6 +146,8 @@ if (isset($_GET["exchangemode"])) {
 					<option value="rating-reverse">Rating (Lowest First)</option>
 					<option value="difficulty-reverse">Difficulty (Lowest First) </option>
 					<option value="difficulty">Difficulty (Highest First)</option>
+					<option value="workload-reverse">Workload (Lowest First) </option>
+					<option value="workload">Workload (Highest First)</option>
 				</select>
 				<?php
 				if ($already_submitted == "ERR_NOT_SUBMITTED") {
@@ -235,6 +237,20 @@ if (isset($_GET["exchangemode"])) {
 					electiveCards.sort(function(a, b) {
 						var difficultyA = a.querySelector(".subtitle-two").innerText.toLowerCase().split(":")[1];
 						var difficultyB = b.querySelector(".subtitle-two").innerText.toLowerCase().split(":")[1];
+						return difficultyB - difficultyA;
+					});
+					break;
+					case "workload-reverse":
+					electiveCards.sort(function(a, b) {
+						var difficultyA = a.querySelector(".subtitle-three").innerText.toLowerCase().split(":")[1];
+						var difficultyB = b.querySelector(".subtitle-three").innerText.toLowerCase().split(":")[1];
+						return difficultyA - difficultyB;
+					});
+					break;
+				case "workload":
+					electiveCards.sort(function(a, b) {
+						var difficultyA = a.querySelector(".subtitle-three").innerText.toLowerCase().split(":")[1];
+						var difficultyB = b.querySelector(".subtitle-three").innerText.toLowerCase().split(":")[1];
 						return difficultyB - difficultyA;
 					});
 					break;
