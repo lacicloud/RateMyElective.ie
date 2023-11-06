@@ -84,6 +84,7 @@ if (isset($_GET["delete"])) {
 					$description = $value[0]["description"];
 					$stars = $api->getElectiveStars($key, $institution);
 					$difficulty = $api->getElectiveStarsDifficulty($key, $institution);
+					$workload = $api->getElectiveStarsWorkload($key, $institution);
 					$entity_type = $api->getEntityTypeByName($key, $institution);
 
 					if ($exchangemode && $entity_type == "elective" || !$exchangemode && $entity_type == "exchange") {
@@ -96,8 +97,17 @@ if (isset($_GET["delete"])) {
 						$specialstring = "Difficulty: ";
 					}
 
+						if ($exchangemode) {
+						$specialstring2 = "Fun: ";
+					} else {
+						$specialstring2 = "Workload: ";
+					}
+
 					$string = floatval($difficulty);
 					$formattedDifficulty = number_format($string, 2, '.', '');
+
+					$string = floatval($workload);
+					$formattedWorkload = number_format($string, 2, '.', '');
 
 					if ($exchangemode) {
 						$href = "./elective.php?elective=$key&exchangemode";
@@ -105,7 +115,7 @@ if (isset($_GET["delete"])) {
 						$href = "./elective.php?elective=$key";
 					}
 
-					reviewCard($key, $description, $stars, $specialstring . $formattedDifficulty, "", $href);
+					reviewCard($key, $description, $stars, $specialstring . $formattedDifficulty, $specialstring2.$formattedWorkload, "", $href);
 				}
 				?>
 			</div>
