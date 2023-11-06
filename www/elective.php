@@ -107,7 +107,7 @@ if (isset($_GET["exchangemode"])) {
 			</div>
 			<div class="space-y-1 md:space-y-3 order-1 sm:order-2">
 				<div class="md:text-lg font-medium text-gray-400">Description</div>
-				<div title="<?php echo $description; ?>" class="line-clamp-3">
+				<div title="<?php echo $description; ?>" class="">
 					<?php echo $description; ?>
 				</div>
 			</div>
