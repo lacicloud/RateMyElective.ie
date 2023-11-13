@@ -100,6 +100,28 @@ if (isset($_POST["reset_key"]) and isset($_POST["password"]) and isset($_POST["p
 
 <head>
   <title>RateMyElective - Account</title>
+
+  <meta name="description" content="With RateMyElective.ie, students can recommend modules and give feedback to other students by leaving reviews with level of difficulty, workload, how good the course is and any other details. You can browse and find cool electives, or electives to avoid. You can filter by difficulty, workload and stars, etc. and seeing how others found Trinity electives!">
+
+  <!-- Facebook Meta Tags -->
+  <meta property="og:url" content="https://ratemyelective.ie/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="RateMyElective.ie">
+  <meta property="og:description" content="With RateMyElective.ie, students can recommend modules and give feedback to other students by leaving reviews with level of difficulty, workload, how good the course is and any other details. You can browse and find cool electives, or electives to avoid. You can filter by difficulty, workload and stars, etc. and seeing how others found Trinity electives!">
+  <meta property="og:image" content="https://ratemyelective.ie/resources/ogimage.svg">
+
+
+
+  <!-- Twitter Meta Tags -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta property="twitter:domain" content="ratemyelective.ie">
+  <meta property="twitter:url" content="https://ratemyelective.ie/">
+  <meta name="twitter:title" content="RateMyElective.ie">
+  <meta name="twitter:description" content="With RateMyElective.ie, students can recommend modules and give feedback to other students by leaving reviews with level of difficulty, workload, how good the course is and any other details. You can browse and find cool electives, or electives to avoid. You can filter by difficulty, workload and stars, etc. and seeing how others found Trinity electives!">
+  <meta name="twitter:image" content="https://ratemyelective.ie/resources/ogimage.svg">
+
+  <!-- Meta Tags Generated via https://www.opengraph.xyz -->
+	
   <?php include('header.php'); ?>
   <?php include('./components/button.php'); ?>
 
